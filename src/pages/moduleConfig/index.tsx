@@ -3,7 +3,6 @@ import { Layout, Input } from "tdesign-react";
 
 import ModHeader from "../../components/ModHeader";
 import ModAside from "../../components/ModAside";
-import { useUserStore } from "../../stores/userStore";
 import { useEffect, useState } from "react";
 import axios from "axios";
 const { Content, Aside } = Layout;
@@ -17,27 +16,97 @@ function ModuleConfigPages() {
     if (!prompt) return;
     requestIng = true;
     axios
-      .post("http://127.0.0.1:5174/api/users", { text: prompt })
+      .post("https://aistudio.cloud.tencent.com/api/users", { text: prompt })
       .then((response) => {
         requestIng = false;
         console.log(response.data); // 响应数据
-        console.log([...token, { ...response.data.choices[0].message }])
-        setToken([...token, { role: "input", value }, { ...response.data.choices[0].message }]);
+        console.log([...token, { ...response.data.choices[0].message }]);
+        setToken([
+          ...token,
+          { role: "input", value },
+          { ...response.data.choices[0].message },
+        ]);
       })
       .catch((error) => {
         requestIng = false;
         console.error(error); // 错误处理
       });
   }
+  // const h5TextRequest = async (prompt: string) => {
+  //   axios
+  //     .post(
+  //       "https://api.openai.com/v1/chat/completions",
+  //       {
+  //         messages: [{ role: "user", content: prompt }],
+  //         temperature: 0.7,
+  //         model: "gpt-3.5-turbo",
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer`,
+  //         },
+  //       }
+  //     )
+  //     .then((response) => {
+  //       requestIng = false;
+  //       console.log(response.data); // 响应数据
+  //       console.log([...token, { ...response.data.choices[0].message }]);
+  //       setToken([
+  //         ...token,
+  //         { role: "input", value },
+  //         { ...response.data.choices[0].message },
+  //       ]);
+  //       console.log(response.data.choices[0].mesages);
+  //     })
+  //     .catch((error) => {
+  //       requestIng = false;
+  //       console.error(error);
+  //     });
+  // };
+
+  // const h5ImageRequest = async (prompt: string) => {
+  //   axios
+  //   .post(
+  //     "https://api.openai.com/v1/images/generations",
+  //     {
+  //       "model": "dall-e-3",
+  //       "prompt": prompt,
+  //       "n": 1,
+  //       "size": "1024x1024"
+  //     },
+  //     {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer `,
+  //       },
+  //     }
+  //   )
+  //   .then((response) => {
+  //     requestIng = false;
+  //     console.log(response.data); // 响应数据
+  //     console.log([...token, { ...response.data.choices[0].message }]);
+  //     setToken([
+  //       ...token,
+  //       { role: "input", value },
+  //       { ...response.data.choices[0].message },
+  //     ]);
+  //     console.log(response.data.choices[0].mesages);
+  //   })
+  //   .catch((error) => {
+  //     requestIng = false;
+  //     console.error(error);
+  //   });
+  // };
   useEffect(() => {}, []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nickname = useUserStore((state: any) => state.nickname);
   const onEnter = async (value: string) => {
-    if (requestIng) {
+    if (requestIng || !value) {
       return;
     }
     await setToken([...token, { role: "input", value }]);
-    main(value);
+    // h5TextRequest(value);
+    main(value)
     setValue("");
   };
   return (
@@ -51,7 +120,7 @@ function ModuleConfigPages() {
           <Content
             className="is-flex"
             style={{
-              background: "gray",
+              background: "#141415",
               position: "relative",
               display: "flex",
             }}
@@ -70,8 +139,8 @@ function ModuleConfigPages() {
                     >
                       <p
                         style={{
-                          border: "1px solid black",
-                          padding: "10px",
+                          border: "1px solid #E5EAF3",
+                          padding: "5px 10px",
                           borderRadius: "5px",
                         }}
                       >
@@ -91,9 +160,7 @@ function ModuleConfigPages() {
                         <!--背景色配置处-->
                         <rect x="1" y="1" width="36" height="36" rx="18" fill="#27B3BC"/>
                         <!--文本配制处-->
-                        <text fill="#ffffff" x="19"  y="20" dominant-baseline="middle" style="text-anchor: middle"  font-family="PingFang SC" font-size="18"  font-weight="500">${nickname.charAt(
-                          0
-                        )}</text>
+                        <text fill="#ffffff" x="19"  y="20" dominant-baseline="middle" style="text-anchor: middle"  font-family="PingFang SC" font-size="18"  font-weight="500">Y</text>
                         <!--边框-->
                         <rect x="1" y="1" width="36" height="36" rx="18" stroke="#ffffff" stroke-width="2"/>
                       </g>
@@ -127,9 +194,7 @@ function ModuleConfigPages() {
                       <!--背景色配置处-->
                       <rect x="1" y="1" width="36" height="36" rx="18" fill="#27B3BC"/>
                       <!--文本配制处-->
-                      <text fill="#ffffff" x="19"  y="20" dominant-baseline="middle" style="text-anchor: middle"  font-family="PingFang SC" font-size="18"  font-weight="500">${nickname.charAt(
-                        0
-                      )}</text>
+                      <text fill="#ffffff" x="19"  y="20" dominant-baseline="middle" style="text-anchor: middle"  font-family="PingFang SC" font-size="18"  font-weight="500">O</text>
                       <!--边框-->
                       <rect x="1" y="1" width="36" height="36" rx="18" stroke="#ffffff" stroke-width="2"/>
                     </g>
@@ -139,8 +204,8 @@ function ModuleConfigPages() {
                     />
                     <p
                       style={{
-                        border: "1px solid black",
-                        padding: "10px",
+                        border: "1px solid #E5EAF3",
+                        padding: "5px 10px",
                         borderRadius: "5px",
                       }}
                     >
@@ -167,7 +232,7 @@ function ModuleConfigPages() {
                 status="default"
                 type="text"
                 style={{ height: "100%" }}
-                onEnter={(value)=>onEnter(value)}
+                onEnter={(value) => onEnter(value)}
                 onChange={(value) => setValue(value)}
               />
             </div>

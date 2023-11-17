@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -24,7 +24,8 @@ const router = createBrowserRouter([
 
 function App() {
   // store
-
+  useEffect(()=>{
+  }, [])
   const [isInit] = useState(true);
 
   function renderContent() {

@@ -11,17 +11,17 @@
   },
   "dependencies": {
     "axios": "^1.6.1",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "http": "0.0.1-security",
     "openai": "^4.18.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0",
+    "require": "^2.4.20",
     "zustand": "^4.4.6"
   },
   "devDependencies": {
-    "@tencent/tpm-ai": "^0.1.29",
-    "@tencent/tpm-ai-icon": "^1.0.7",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

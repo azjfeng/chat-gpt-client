@@ -8,6 +8,9 @@ dependencies:
   axios:
     specifier: ^1.6.1
     version: 1.6.1
+  cors:
+    specifier: ^2.8.5
+    version: 2.8.5
   express:
     specifier: ^4.18.2
     version: 4.18.2
@@ -26,17 +29,14 @@ dependencies:
   react-router-dom:
     specifier: ^6.18.0
     version: 6.18.0(react-dom@18.2.0)(react@18.2.0)
+  require:
+    specifier: ^2.4.20
+    version: 2.4.20
   zustand:
     specifier: ^4.4.6
     version: 4.4.6(@types/react@18.2.17)(react@18.2.0)
 
 devDependencies:
-  '@tencent/tpm-ai':
-    specifier: ^0.1.29
-    version: 0.1.29(react-dom@18.2.0)(react@18.2.0)
-  '@tencent/tpm-ai-icon':
-    specifier: ^1.0.7
-    version: 1.0.7(react-dom@18.2.0)(react@18.2.0)
   '@types/react':
     specifier: ^18.2.15
     version: 18.2.17
@@ -637,34 +637,6 @@ packages:
     engines: {node: '>=14.0.0'}
     dev: false
 
-  /@tencent/tpm-ai-icon@1.0.7(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-8iRQenRI5L9DuY9T5WQOA4z8odg+Cy+pZ72Ok653/nTRmzIk0fb8oVDTH5iialXCy4+KCn5IuuBtlL74Cd8CsQ==, tarball: https://mirrors.tencent.com/npm/@tencent/tpm-ai-icon/-/@tencent/tpm-ai-icon-1.0.7.tgz}
-    peerDependencies:
-      react: '>=16.13.1'
-      react-dom: '>=16.13.1'
-    dependencies:
-      classnames: 2.3.2
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: true
-
-  /@tencent/tpm-ai@0.1.29(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-cL82f9XzBmunSaE+K5X7y8LmLnEv2/GTEcCe0ujUYkkv65DtWtnMtDM8nO64uBxY4JRsIZufDBjkHomK6IhKWA==, tarball: https://mirrors.tencent.com/npm/@tencent/tpm-ai/-/@tencent/tpm-ai-0.1.29.tgz}
-    peerDependencies:
-      react: ^17.0.1
-      react-dom: ^17.0.1
-    dependencies:
-      '@babel/runtime': 7.23.2
-      '@tencent/tpm-ai-icon': 1.0.7(react-dom@18.2.0)(react@18.2.0)
-      classnames: 2.3.2
-      eventemitter3: 4.0.7
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      swiper: 9.4.1
-      tdesign-icons-react: 0.2.5(react-dom@18.2.0)(react@18.2.0)
-      tdesign-react: 1.2.0(react-dom@18.2.0)(react@18.2.0)
-    dev: true
-
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
     dev: true
@@ -953,6 +925,11 @@ packages:
       uri-js: 4.4.1
     dev: true
 
+  /amdefine@1.0.1:
+    resolution: {integrity: sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=}
+    engines: {node: '>=0.4.2'}
+    dev: false
+
   /ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -984,6 +961,10 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
     dev: true
+
+  /async@0.2.10:
+    resolution: {integrity: sha1-trvgsGdLnXGXCMo43owjfLUmw9E=}
+    dev: false
 
   /asynckit@0.4.0:
     resolution: {integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=}
@@ -1154,6 +1135,14 @@ packages:
   /cookie@0.5.0:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /cors@2.8.5:
+    resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
+    engines: {node: '>= 0.10'}
+    dependencies:
+      object-assign: 4.1.1
+      vary: 1.1.2
     dev: false
 
   /cross-spawn@7.0.3:
@@ -1448,10 +1437,6 @@ packages:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
     dev: false
-
-  /eventemitter3@4.0.7:
-    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
-    dev: true
 
   /express@4.18.2:
     resolution: {integrity: sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==}
@@ -2034,7 +2019,6 @@ packages:
   /object-assign@4.1.1:
     resolution: {integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=}
     engines: {node: '>=0.10.0'}
-    dev: true
 
   /object-inspect@1.13.1:
     resolution: {integrity: sha512-5qoj1RUiKOMsCCNLV1CBiPYE10sziTsnmNxkAI/rZhiD63CF7IqdFGC/XzjWjpSgLf0LxXX3bDFIh0E18f6UhQ==}
@@ -2068,6 +2052,12 @@ packages:
       web-streams-polyfill: 3.2.1
     transitivePeerDependencies:
       - encoding
+    dev: false
+
+  /optimist@0.3.7:
+    resolution: {integrity: sha1-yQlBrVnkJzMokjB00s8ufLxuwNk=}
+    dependencies:
+      wordwrap: 0.0.3
     dev: false
 
   /optionator@0.9.3:
@@ -2307,6 +2297,14 @@ packages:
     resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
     dev: true
 
+  /require@2.4.20:
+    resolution: {integrity: sha1-Zstrqqu2XeinHXk/XGX9GE83mLY=}
+    hasBin: true
+    dependencies:
+      std: 0.1.40
+      uglify-js: 2.3.0
+    dev: false
+
   /resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
@@ -2445,13 +2443,20 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /ssr-window@4.0.2:
-    resolution: {integrity: sha512-ISv/Ch+ig7SOtw7G2+qkwfVASzazUnvlDTwypdLoPoySv+6MqlOV10VwPSE6EWkGjhW50lUmghPmpYZXMu/+AQ==}
-    dev: true
+  /source-map@0.1.43:
+    resolution: {integrity: sha1-wkvBRspRfBRx9drL4lcbK3+eM0Y=}
+    engines: {node: '>=0.8.0'}
+    dependencies:
+      amdefine: 1.0.1
+    dev: false
 
   /statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
+    dev: false
+
+  /std@0.1.40:
+    resolution: {integrity: sha1-Nnil9lCU2eG2teJu2/wCErg0K3E=}
     dev: false
 
   /strip-ansi@6.0.1:
@@ -2478,13 +2483,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
-
-  /swiper@9.4.1:
-    resolution: {integrity: sha512-1nT2T8EzUpZ0FagEqaN/YAhRj33F2x/lN6cyB0/xoYJDMf8KwTFT3hMOeoB8Tg4o3+P/CKqskP+WX0Df046fqA==}
-    engines: {node: '>= 4.7.0'}
-    dependencies:
-      ssr-window: 4.0.2
     dev: true
 
   /tdesign-icons-react@0.2.5(react-dom@18.2.0)(react@18.2.0):
@@ -2607,6 +2605,16 @@ packages:
     engines: {node: '>=12.20'}
     hasBin: true
     dev: true
+
+  /uglify-js@2.3.0:
+    resolution: {integrity: sha1-LN7BbTeKiituz7aYl4TPi3rlSR8=}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+    dependencies:
+      async: 0.2.10
+      optimist: 0.3.7
+      source-map: 0.1.43
+    dev: false
 
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
@@ -2731,6 +2739,11 @@ packages:
     dependencies:
       isexe: 2.0.0
     dev: true
+
+  /wordwrap@0.0.3:
+    resolution: {integrity: sha1-o9XabNXAvAAI03I0u68b7WMFkQc=}
+    engines: {node: '>=0.4.0'}
+    dev: false
 
   /wrappy@1.0.2:
     resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
