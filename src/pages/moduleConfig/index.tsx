@@ -4,9 +4,10 @@ import { Layout, Input } from "tdesign-react";
 import ModHeader from "../../components/ModHeader";
 import ModAside from "../../components/ModAside";
 import { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 const { Content, Aside } = Layout;
 let requestIng = false;
+// const controller = new AbortController();
 
 function ModuleConfigPages() {
   const [value, setValue] = useState("");
@@ -15,89 +16,45 @@ function ModuleConfigPages() {
   async function main(prompt: string) {
     if (!prompt) return;
     requestIng = true;
-    axios
-      .post("https://aistudio.cloud.tencent.com/api/users", { text: prompt })
-      .then((response) => {
-        requestIng = false;
-        console.log(response.data); // 响应数据
-        console.log([...token, { ...response.data.choices[0].message }]);
-        setToken([
-          ...token,
-          { role: "input", value },
-          { ...response.data.choices[0].message },
-        ]);
-      })
-      .catch((error) => {
-        requestIng = false;
-        console.error(error); // 错误处理
-      });
-  }
-  // const h5TextRequest = async (prompt: string) => {
-  //   axios
-  //     .post(
-  //       "https://api.openai.com/v1/chat/completions",
-  //       {
-  //         messages: [{ role: "user", content: prompt }],
-  //         temperature: 0.7,
-  //         model: "gpt-3.5-turbo",
-  //       },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer`,
-  //         },
-  //       }
-  //     )
-  //     .then((response) => {
-  //       requestIng = false;
-  //       console.log(response.data); // 响应数据
-  //       console.log([...token, { ...response.data.choices[0].message }]);
-  //       setToken([
-  //         ...token,
-  //         { role: "input", value },
-  //         { ...response.data.choices[0].message },
-  //       ]);
-  //       console.log(response.data.choices[0].mesages);
-  //     })
-  //     .catch((error) => {
-  //       requestIng = false;
-  //       console.error(error);
-  //     });
-  // };
+    // fetch("http://127.0.0.1:5173/api/text/getGenerateStream", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ prompt: prompt }),
+    // })
+    //   .then((response: any) => {
+    //     return response.json();
+    //   })
+    //   .then((res) => {
+    //     console.log('res',)
+    //   })
+    //   .catch((error) => {
+    //     console.error("请求发生错误:", error);
+    //   });
 
-  // const h5ImageRequest = async (prompt: string) => {
-  //   axios
-  //   .post(
-  //     "https://api.openai.com/v1/images/generations",
-  //     {
-  //       "model": "dall-e-3",
-  //       "prompt": prompt,
-  //       "n": 1,
-  //       "size": "1024x1024"
-  //     },
-  //     {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer `,
-  //       },
-  //     }
-  //   )
-  //   .then((response) => {
-  //     requestIng = false;
-  //     console.log(response.data); // 响应数据
-  //     console.log([...token, { ...response.data.choices[0].message }]);
-  //     setToken([
-  //       ...token,
-  //       { role: "input", value },
-  //       { ...response.data.choices[0].message },
-  //     ]);
-  //     console.log(response.data.choices[0].mesages);
-  //   })
-  //   .catch((error) => {
-  //     requestIng = false;
-  //     console.error(error);
-  //   });
-  // };
+    const eventSource = new EventSource("http://127.0.0.1:5173/api/text/getGenerateStream", {
+    });
+
+    eventSource.onopen = function () {
+      console.log("连接已建立");
+    };
+    eventSource.onmessage = function (event) {
+      console.log('event', event);
+      const eventData = JSON.parse(event.data);
+      // 处理推送的数据
+      console.log(eventData);
+    };
+
+    eventSource.onerror = function (error) {
+      eventSource.close();
+      console.error("连接发生错误:", error);
+    };
+
+    eventSource.close = function () {
+      console.log("连接已关闭");
+    };
+  }
   useEffect(() => {}, []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onEnter = async (value: string) => {
@@ -106,7 +63,7 @@ function ModuleConfigPages() {
     }
     await setToken([...token, { role: "input", value }]);
     // h5TextRequest(value);
-    main(value)
+    main(value);
     setValue("");
   };
   return (
