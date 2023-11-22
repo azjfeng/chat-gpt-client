@@ -4,66 +4,95 @@ import { Layout, Input } from "tdesign-react";
 import ModHeader from "../../components/ModHeader";
 import ModAside from "../../components/ModAside";
 import { useEffect, useState } from "react";
+import hash from "js-sha256";
 // import axios from "axios";
 const { Content, Aside } = Layout;
-let requestIng = false;
-// const controller = new AbortController();
 
 function ModuleConfigPages() {
+  let eventSource: any = null;
   const [value, setValue] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [token, setToken] = useState<any>([]);
-  async function main(prompt: string) {
-    if (!prompt) return;
-    requestIng = true;
-    // fetch("http://127.0.0.1:5173/api/text/getGenerateStream", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ prompt: prompt }),
-    // })
-    //   .then((response: any) => {
-    //     return response.json();
-    //   })
-    //   .then((res) => {
-    //     console.log('res',)
-    //   })
-    //   .catch((error) => {
-    //     console.error("请求发生错误:", error);
-    //   });
-
-    const eventSource = new EventSource("http://127.0.0.1:5173/api/text/getGenerateStream", {
-    });
-
+  const [token, setToken] = useState<any>({});
+  const [requestIng, setRequestIng] = useState(false);
+  const [tokenList, setTokenList] = useState<any>([]);
+  const [chatHash, setChatHash] = useState("");
+  const streamRequest = async (prompt: string, chatHash: string) => {
+    if (!prompt && !chatHash) return;
+    setRequestIng(true);
+    eventSource = new EventSource(
+      `http://${location.host}/api/text/getGenerateStream?prompt=${prompt}`,
+      {}
+    );
     eventSource.onopen = function () {
       console.log("连接已建立");
     };
-    eventSource.onmessage = function (event) {
-      console.log('event', event);
+    eventSource.onmessage = function (event: { data: string; }) {
       const eventData = JSON.parse(event.data);
+      const { delta, finish_reason } = eventData.choices[0];
+      if (finish_reason) {
+        eventSource.close();
+        setChatHash("");
+        return;
+      }
       // 处理推送的数据
-      console.log(eventData);
+      if (token[chatHash]) {
+        token[chatHash].content += delta.content;
+      } else {
+        token[chatHash] = { ...delta, role: "token" };
+      }
+      setToken({ ...token });
     };
 
-    eventSource.onerror = function (error) {
+    eventSource.onerror = function (error: any) {
       eventSource.close();
+      setRequestIng(false);
+      setChatHash("");
       console.error("连接发生错误:", error);
     };
 
     eventSource.close = function () {
+      setRequestIng(false);
+      setChatHash("");
       console.log("连接已关闭");
     };
-  }
-  useEffect(() => {}, []);
+  };
+  // const asyncRequest = async (prompt: string) => {
+  //   fetch(`http://${location.host}/api/text/getGenerate`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ prompt: prompt }),
+  //   })
+  //     .then((response: any) => {
+  //       return response.json();
+  //     })
+  //     .then((res) => {
+  //       console.log("res", res);
+  //     })
+  //     .catch((error) => {
+  //       console.error("请求发生错误:", error);
+  //     });
+  // };
+  useEffect(() => {
+    const list = Object.values(token);
+    setTokenList(list);
+  }, [token]);
+  useEffect(() => {
+      streamRequest(value, chatHash);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatHash]);
+  const generateHash = (text: string) => {
+    return hash.sha256(text);
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onEnter = async (value: string) => {
     if (requestIng || !value) {
       return;
     }
-    await setToken([...token, { role: "input", value }]);
-    // h5TextRequest(value);
-    main(value);
+    const hash = generateHash(value+ new Date().getTime());
+    setChatHash(hash);
+    setToken({ ...token, [value+ new Date().getTime()]: { role: "input", value } });
     setValue("");
   };
   return (
@@ -83,7 +112,7 @@ function ModuleConfigPages() {
             }}
           >
             <div style={{ flex: 1, paddingBottom: 100 }}>
-              {token.map((item: any) => {
+              {tokenList.map((item: any, key: number) => {
                 if (item.role === "input") {
                   return (
                     <div
@@ -93,6 +122,7 @@ function ModuleConfigPages() {
                         color: "white",
                         justifyContent: "end",
                       }}
+                      key={key}
                     >
                       <p
                         style={{
@@ -132,10 +162,12 @@ function ModuleConfigPages() {
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      // alignItems: "center",
                       color: "white",
                       justifyContent: "flex-start",
+                      width: '50%'
                     }}
+                    key={key}
                   >
                     <div
                       style={{
