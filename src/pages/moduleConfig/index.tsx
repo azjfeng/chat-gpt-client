@@ -56,32 +56,33 @@ function ModuleConfigPages() {
       console.log("连接已关闭");
     };
   };
-  // const asyncRequest = async (prompt: string) => {
-  //   fetch(`http://${location.host}/api/text/getGenerate`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ prompt: prompt }),
-  //   })
-  //     .then((response: any) => {
-  //       return response.json();
-  //     })
-  //     .then((res) => {
-  //       console.log("res", res);
-  //     })
-  //     .catch((error) => {
-  //       console.error("请求发生错误:", error);
-  //     });
-  // };
+  const asyncRequest = async (prompt: string) => {
+    fetch(`http://${location.host}/api/text/getGenerate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: prompt }),
+    })
+      .then((response: any) => {
+        return response.json();
+      })
+      .then((res) => {
+        console.log("res", res);
+        const { message } = res.choices[0];
+        // 处理推送的数据
+        token[chatHash] = { ...message, role: "assistant" };
+        console.log(token)
+        setToken({ ...token });
+      })
+      .catch((error) => {
+        console.error("请求发生错误:", error);
+      });
+  };
   useEffect(() => {
     const list = Object.values(token);
     setTokenList(list);
   }, [token]);
-  useEffect(() => {
-      streamRequest(value, chatHash);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatHash]);
   const generateHash = (text: string) => {
     return hash.sha256(text);
   };
@@ -93,7 +94,9 @@ function ModuleConfigPages() {
     const hash = generateHash(value+ new Date().getTime());
     setChatHash(hash);
     setToken({ ...token, [value+ new Date().getTime()]: { role: "input", value } });
-    setValue("");
+    // streamRequest(value, chatHash);
+    asyncRequest(value)
+    // setValue("");
   };
   return (
     <div className="pg-text2img">
