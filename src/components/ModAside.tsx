@@ -3,23 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { Menu, MenuValue } from "tdesign-react";
 
 const HEADER_TAB = {
-  moduleConfig: "/module-config",
-  imageToImage: "/image-to-image",
-  myWork: "/my-work",
+  chat: "chat",
+  chatStream: "chatStream",
+  myWork: "my-work",
 };
 
 const { MenuItem } = Menu;
 
 function ModAside() {
-  const [active, setActive] = useState<MenuValue>("moduleConfig");
+  const [active, setActive] = useState<MenuValue>("chat");
   const navigate = useNavigate();
   function handleTabItemSelect(val: MenuValue) {
     setActive(val);
     switch (val) {
-      case HEADER_TAB.imageToImage:
-        return navigate("/image-to-image");
-      case HEADER_TAB.moduleConfig:
-        return navigate("/module-config");
+      case HEADER_TAB.chat:
+        return navigate("/chat");
+      case HEADER_TAB.chatStream:
+        return navigate("/chatStream");
     }
   }
   return (
@@ -30,8 +30,11 @@ function ModAside() {
         onChange={handleTabItemSelect}
         value={active}
       >
-        <MenuItem value={"moduleConfig"}>
+        <MenuItem value={"chat"}>
           <span>chat</span>
+        </MenuItem>
+        <MenuItem value={"chatStream"}>
+          <span>chatStream</span>
         </MenuItem>
       </Menu>
     </Fragment>

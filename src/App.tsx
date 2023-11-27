@@ -4,7 +4,8 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import ModuleConfigPages from "./pages/moduleConfig";
+import ChatTextPages from "./pages/chatText";
+import ChatTextStreamPages from "./pages/chatTextStream";
 import "tdesign-react/es/style/index.css"; // 少量公共样式
 import "./index.css";
 import { Loading } from "tdesign-react";
@@ -18,7 +19,12 @@ const router = createBrowserRouter([
   {
     path: "/chat",
     index: true,
-    element: <ModuleConfigPages />,
+    element: <ChatTextPages />,
+  },
+  {
+    path: "/chatStream",
+    index: true,
+    element: <ChatTextStreamPages />,
   },
 ]);
 

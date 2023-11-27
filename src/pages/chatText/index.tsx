@@ -8,55 +8,15 @@ import hash from "js-sha256";
 // import axios from "axios";
 const { Content, Aside } = Layout;
 
-function ModuleConfigPages() {
-  let eventSource: any = null;
+function ChatTextPages() {
   const [value, setValue] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [token, setToken] = useState<any>({});
   const [requestIng, setRequestIng] = useState(false);
   const [tokenList, setTokenList] = useState<any>([]);
   const [chatHash, setChatHash] = useState("");
-  const streamRequest = async (prompt: string, chatHash: string) => {
-    if (!prompt && !chatHash) return;
-    setRequestIng(true);
-    eventSource = new EventSource(
-      `http://${location.host}/api/text/getGenerateStream?prompt=${prompt}`,
-      {}
-    );
-    eventSource.onopen = function () {
-      console.log("连接已建立");
-    };
-    eventSource.onmessage = function (event: { data: string; }) {
-      const eventData = JSON.parse(event.data);
-      const { delta, finish_reason } = eventData.choices[0];
-      if (finish_reason) {
-        eventSource.close();
-        setChatHash("");
-        return;
-      }
-      // 处理推送的数据
-      if (token[chatHash]) {
-        token[chatHash].content += delta.content;
-      } else {
-        token[chatHash] = { ...delta, role: "token" };
-      }
-      setToken({ ...token });
-    };
-
-    eventSource.onerror = function (error: any) {
-      eventSource.close();
-      setRequestIng(false);
-      setChatHash("");
-      console.error("连接发生错误:", error);
-    };
-
-    eventSource.close = function () {
-      setRequestIng(false);
-      setChatHash("");
-      console.log("连接已关闭");
-    };
-  };
   const asyncRequest = async (prompt: string) => {
+    setRequestIng(true);
     fetch(`http://${location.host}/api/text/getGenerate`, {
       method: "POST",
       headers: {
@@ -74,8 +34,10 @@ function ModuleConfigPages() {
         token[chatHash] = { ...message, role: "assistant" };
         console.log(token)
         setToken({ ...token });
+        setRequestIng(false);
       })
       .catch((error) => {
+        setRequestIng(false);
         console.error("请求发生错误:", error);
       });
   };
@@ -235,4 +197,4 @@ function ModuleConfigPages() {
   );
 }
 
-export default ModuleConfigPages;
+export default ChatTextPages;
