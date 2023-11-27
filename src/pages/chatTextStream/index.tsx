@@ -6,6 +6,7 @@ import ModAside from "../../components/ModAside";
 import { useEffect, useState } from "react";
 import hash from "js-sha256";
 const { Content, Aside } = Layout;
+// import { io } from "socket.io-client";
 
 function ChatTextStreamPages() {
   let wsClient: WebSocket | null = null;
@@ -18,20 +19,44 @@ function ChatTextStreamPages() {
   const streamRequest = async (prompt: string, chatHash: string) => {
     if (!prompt && !chatHash) return;
     setRequestIng(true);
-    if(!wsClient){
-       wsClient = new WebSocket('ws://localhost:4000');
-    }
-    wsClient.onopen = ()=>{
-      console.log('aaaa');
-    }
+    // const socket = io("http://localhost:5173"); // 替换为您的 Socket.IO 服务器地址
 
-    wsClient.onmessage = (event)=>{
-      console.log(event.data)
-    }
+    // socket.on("connect", () => {
+    //   console.log("Connected to Socket.IO server");
 
-    wsClient.onerror = (err)=>{
-      console.log(err)
+    //   // 发送消息
+    //   const message = {
+    //     type: "message",
+    //     data: "Hello, server!",
+    //   };
+    //   socket.emit("message", message);
+    // });
+
+    if (!wsClient) {
+      wsClient = new WebSocket("ws://localhost:4000");
     }
+    wsClient.addEventListener("open", () => {
+      console.log("Connected to WebSocket server");
+
+      // 发送消息
+      const message = {
+        type: "message",
+        prompt: "Hello, server!",
+      };
+      wsClient?.send(JSON.stringify(message));
+    });
+
+    wsClient.addEventListener("message", (event) => {
+      console.log("Received message:", event.data);
+    });
+
+    wsClient.addEventListener("error", (error) => {
+      console.log("WebSocket error:", error);
+    });
+
+    wsClient.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
+    });
   };
   useEffect(() => {
     const list = Object.values(token);
@@ -45,9 +70,12 @@ function ChatTextStreamPages() {
     if (requestIng || !value) {
       return;
     }
-    const hash = generateHash(value+ new Date().getTime());
+    const hash = generateHash(value + new Date().getTime());
     setChatHash(hash);
-    setToken({ ...token, [value+ new Date().getTime()]: { role: "input", value } });
+    setToken({
+      ...token,
+      [value + new Date().getTime()]: { role: "input", value },
+    });
     streamRequest(value, chatHash);
     // setValue("");
   };
@@ -121,7 +149,7 @@ function ChatTextStreamPages() {
                       // alignItems: "center",
                       color: "white",
                       justifyContent: "flex-start",
-                      width: '50%'
+                      width: "50%",
                     }}
                     key={key}
                   >
