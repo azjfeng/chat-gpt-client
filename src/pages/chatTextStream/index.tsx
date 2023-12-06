@@ -3,64 +3,78 @@ import { Layout, Input } from "tdesign-react";
 
 import ModHeader from "../../components/ModHeader";
 import ModAside from "../../components/ModAside";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import hash from "js-sha256";
 const { Content, Aside } = Layout;
-// import { io } from "socket.io-client";
 
 function ChatTextStreamPages() {
-  let wsClient: WebSocket | null = null;
-  const [value, setValue] = useState("");
+  const wsClientRef = useRef<any>(null);
+  const [sendText, setSendText] = useState("");
+  const [inputValue, setInputValue] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [token, setToken] = useState<any>({});
   const [requestIng, setRequestIng] = useState(false);
-  const [tokenList, setTokenList] = useState<any>([]);
+  const [chatList, setChatList] = useState<any>([]);
   const [chatHash, setChatHash] = useState("");
-  const streamRequest = async (prompt: string, chatHash: string) => {
-    if (!prompt && !chatHash) return;
-    setRequestIng(true);
-    // const socket = io("http://localhost:5173"); // 替换为您的 Socket.IO 服务器地址
+  useEffect(() => {
+    const initSocket = () => {
+      if (!wsClientRef.current) {
+        const wsClient = new WebSocket("ws://localhost:4000");
+        wsClient.addEventListener("open", () => {
+          console.log("Connected to WebSocket server");
+        });
+        wsClient.addEventListener("message", (event) => {
+          const result = JSON.parse(event.data);
+          const message = result?.choices[0];
+          if (message.finish_reason) {
+            setRequestIng(false);
+            return;
+          }
+          // 处理推送的数据
+          const { content, role } = message.delta;
 
-    // socket.on("connect", () => {
-    //   console.log("Connected to Socket.IO server");
+          token[chatHash] = { content: (token[chatHash]?.content || '') + content, role};
+          setToken({ ...token });
+          console.log("Received message:", content);
+        });
 
-    //   // 发送消息
-    //   const message = {
-    //     type: "message",
-    //     data: "Hello, server!",
-    //   };
-    //   socket.emit("message", message);
-    // });
+        wsClient.addEventListener("error", (error) => {
+          console.log("WebSocket error:", error);
+        });
 
-    if (!wsClient) {
-      wsClient = new WebSocket("ws://localhost:4000");
-    }
-    wsClient.addEventListener("open", () => {
-      console.log("Connected to WebSocket server");
+        wsClient.addEventListener("close", () => {
+          console.log("WebSocket connection closed");
+        });
+        return wsClient;
+      }
+    };
+    wsClientRef.current = initSocket();
+    return () => {
+      try {
+        wsClientRef.current.close();
+        wsClientRef.current = null;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  }, []);
 
+  useEffect(() => {
+    if (wsClientRef.current && sendText) {
       // 发送消息
       const message = {
         type: "message",
-        prompt: "Hello, server!",
+        prompt: sendText,
       };
-      wsClient?.send(JSON.stringify(message));
-    });
-
-    wsClient.addEventListener("message", (event) => {
-      console.log("Received message:", event.data);
-    });
-
-    wsClient.addEventListener("error", (error) => {
-      console.log("WebSocket error:", error);
-    });
-
-    wsClient.addEventListener("close", () => {
-      console.log("WebSocket connection closed");
-    });
-  };
+      if (wsClientRef?.current?.readyState === 1) {
+        wsClientRef.current?.send(JSON.stringify(message));
+        setRequestIng(true);
+      }
+    }
+  }, [sendText]);
   useEffect(() => {
     const list = Object.values(token);
-    setTokenList(list);
+    setChatList(list);
   }, [token]);
   const generateHash = (text: string) => {
     return hash.sha256(text);
@@ -70,14 +84,14 @@ function ChatTextStreamPages() {
     if (requestIng || !value) {
       return;
     }
+    setSendText(value);
+    setInputValue("");
     const hash = generateHash(value + new Date().getTime());
     setChatHash(hash);
     setToken({
       ...token,
       [value + new Date().getTime()]: { role: "input", value },
     });
-    streamRequest(value, chatHash);
-    // setValue("");
   };
   return (
     <div className="pg-text2img">
@@ -96,7 +110,7 @@ function ChatTextStreamPages() {
             }}
           >
             <div style={{ flex: 1, paddingBottom: 100 }}>
-              {tokenList.map((item: any, key: number) => {
+              {chatList.map((item: any, key: number) => {
                 if (item.role === "input") {
                   return (
                     <div
@@ -199,14 +213,14 @@ function ChatTextStreamPages() {
               }}
             >
               <Input
-                value={value}
+                value={inputValue}
                 align="left"
                 size="medium"
                 status="default"
                 type="text"
                 style={{ height: "100%" }}
                 onEnter={(value) => onEnter(value)}
-                onChange={(value) => setValue(value)}
+                onChange={(value) => setInputValue(value)}
               />
             </div>
           </Content>
