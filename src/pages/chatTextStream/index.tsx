@@ -84,7 +84,6 @@ function ChatTextStreamPages() {
   };
 
   const receiveResult = (data: any) => {
-    console.log("sendText", sendText);
     const result = JSON.parse(data);
     const message = result?.choices[0];
     if (message.finish_reason) {
