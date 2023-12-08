@@ -13,6 +13,7 @@
     "axios": "^1.6.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "github-markdown-css": "^5.4.0",
     "http": "0.0.1-security",
     "js-sha256": "^0.10.1",
     "openai": "^4.18.0",

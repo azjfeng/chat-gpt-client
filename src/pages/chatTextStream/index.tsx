@@ -7,14 +7,15 @@ import { useEffect, useState, useRef } from "react";
 import hash from "js-sha256";
 const { Content, Aside } = Layout;
 
+let hashText: string = "";
+let sendText: string = "";
+
 function ChatTextStreamPages() {
   const wsClientRef = useRef<any>(null);
-  const [sendText, setSendText] = useState("");
+  // const [sendText, setSendText] = useState("");
   const [inputValue, setInputValue] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [token, setToken] = useState<any>({});
   const [requestIng, setRequestIng] = useState(false);
-  const [chatList, setChatList] = useState<any>([]);
   const [chatHash, setChatHash] = useState("");
   useEffect(() => {
     const initSocket = () => {
@@ -24,21 +25,11 @@ function ChatTextStreamPages() {
           console.log("Connected to WebSocket server");
         });
         wsClient.addEventListener("message", (event) => {
-          const result = JSON.parse(event.data);
-          const message = result?.choices[0];
-          if (message.finish_reason) {
-            setRequestIng(false);
-            return;
-          }
-          // 处理推送的数据
-          const { content, role } = message.delta;
-
-          token[chatHash] = { content: (token[chatHash]?.content || '') + content, role};
-          setToken({ ...token });
-          console.log("Received message:", content);
+          receiveResult(event.data);
         });
 
         wsClient.addEventListener("error", (error) => {
+          wsClient.close();
           console.log("WebSocket error:", error);
         });
 
@@ -71,27 +62,53 @@ function ChatTextStreamPages() {
         setRequestIng(true);
       }
     }
-  }, [sendText]);
-  useEffect(() => {
-    const list = Object.values(token);
-    setChatList(list);
-  }, [token]);
+  }, [chatHash]);
+
   const generateHash = (text: string) => {
     return hash.sha256(text);
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onEnter = async (value: string) => {
+  const onEnter = (value: string) => {
     if (requestIng || !value) {
       return;
     }
-    setSendText(value);
-    setInputValue("");
+    hashText = generateHash(value + new Date().getTime());
+    sendText = value;
     const hash = generateHash(value + new Date().getTime());
     setChatHash(hash);
     setToken({
       ...token,
       [value + new Date().getTime()]: { role: "input", value },
     });
+    // setSendText(value);
+    setInputValue("");
+  };
+
+  const receiveResult = (data: any) => {
+    console.log("sendText", sendText);
+    const result = JSON.parse(data);
+    const message = result?.choices[0];
+    if (message.finish_reason) {
+      setRequestIng(false);
+      return;
+    }
+    // 处理推送的数据
+    const { content, role } = message.delta;
+    if (!token[hashText]) {
+      token[sendText + new Date().getTime()] = { role: "input", value: sendText };
+      token[hashText] = {
+        content: (token[hashText]?.content || "") + content,
+        role,
+      };
+      setToken({
+        ...token,
+      });
+    } else {
+      token[hashText] = {
+        content: (token[hashText]?.content || "") + content,
+        role,
+      };
+      setToken({ ...token });
+    }
   };
   return (
     <div className="pg-text2img">
@@ -110,7 +127,7 @@ function ChatTextStreamPages() {
             }}
           >
             <div style={{ flex: 1, paddingBottom: 100 }}>
-              {chatList.map((item: any, key: number) => {
+              {Object.values(token).map((item: any, key: number) => {
                 if (item.role === "input") {
                   return (
                     <div
@@ -122,15 +139,17 @@ function ChatTextStreamPages() {
                       }}
                       key={key}
                     >
-                      <p
+                      <div
                         style={{
                           border: "1px solid #E5EAF3",
                           padding: "5px 10px",
                           borderRadius: "5px",
+                          marginTop: "32px !important",
+                          background: "grey",
                         }}
                       >
                         {item.value}
-                      </p>
+                      </div>
                       <div
                         style={{
                           display: "inline-flex",
@@ -160,7 +179,7 @@ function ChatTextStreamPages() {
                   <div
                     style={{
                       display: "flex",
-                      // alignItems: "center",
+                      alignItems: "flex-start",
                       color: "white",
                       justifyContent: "flex-start",
                       width: "50%",
@@ -189,15 +208,19 @@ function ChatTextStreamPages() {
                 `,
                       }}
                     />
-                    <p
+                    <div
                       style={{
                         border: "1px solid #E5EAF3",
                         padding: "5px 10px",
                         borderRadius: "5px",
+                        marginTop: "16px",
+                        background: "grey",
                       }}
-                    >
-                      {item.content}
-                    </p>
+                      className="markdown-body"
+                      dangerouslySetInnerHTML={{
+                        __html: (window as any).marked.parse(item.content),
+                      }}
+                    ></div>
                   </div>
                 );
               })}
